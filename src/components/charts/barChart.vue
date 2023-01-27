@@ -1,30 +1,29 @@
 <template>
-  <div
-    class="q-my-none q-mt-none"
+<div
+    class="q-my-none q-mt-none bg-black"
     style="
-      max-width: 90%;
+      background-color: rgba(0, 0, 0, 0.25);
+      max-height: 35vh;
       border: 0px solid rgb(160, 160, 160);
       position: relative;
-      left: 5%;
+      left: 0%;
     "
   >
-    <Bar
-      :chartData="chartData"
-      :chart-options="chartOptions"
-      :chart-data="chartData"
-      :chart-id="chartId"
-      :dataset-id-key="datasetIdKey"
-      :plugins="plugins"
-      :css-classes="cssClasses"
-      :styles="styles"
-      :width="width"
-      :height="height"
-    />
-  </div>
+  <Bar
+    :data="data"
+    :options="options"
+    :chart-id="chartId"
+    :dataset-id-key="datasetIdKey"
+    :plugins="plugins"
+    :css-classes="cssClasses"
+    :styles="styles"
+    :width="width"
+    :height="height"
+  />
+</div>
 </template>
 
 <script>
-import { Bar } from "vue-chartjs";
 import {
   Chart as ChartJS,
   Title,
@@ -34,30 +33,45 @@ import {
   CategoryScale,
   LinearScale,
 } from "chart.js";
+import { Bar } from "vue-chartjs";
 
 ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
   Title,
   Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
+  Legend
 );
 
 export default {
-  name: "BarChart",
-  components: { Bar },
+  name: "App",
+  components: {
+    Bar,
+  },
   props: {
-    chartData: {
+    data: {
       type: Object,
       default: {
-        labels: ["Degraded", "Improved", "Stable"],
+        labels: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ],
         datasets: [
           {
-            backgroundColor: ["#b71c1c", "#2e7d32", "#fff9b4"],
-            data: [20, 30, 60],
-            barPercentage: 0.5,
-            categoryPercentage: 0.5,
+            label: "Data One",
+            backgroundColor: "#b3cde0",
+            data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11],
           },
         ],
       },
@@ -72,11 +86,11 @@ export default {
     },
     width: {
       type: Number,
-      default: 400,
+      default: 0,
     },
     height: {
       type: Number,
-      default: 400,
+      default: 0,
     },
     cssClasses: {
       default: "",
@@ -97,13 +111,13 @@ export default {
         layout: {
           padding: 0,
         },
-        responsive: true,
+        responsive: false,
         maintainAspectRatio: false,
         plugins: {
           datalabels: {
-            display: 'auto',
-            anchor: 'end',
-            align: 'end',
+            display: "auto",
+            anchor: "end",
+            align: "end",
             offset: 10,
             opacity: 0.9,
             formatter: (val, ctx) => {
@@ -111,7 +125,7 @@ export default {
               const label = ctx.chart.data.labels[ctx.dataIndex];
 
               // Format the number with 2 decimal places
-              const formattedVal = Intl.NumberFormat('en-US', {
+              const formattedVal = Intl.NumberFormat("en-US", {
                 minimumFractionDigits: 1,
               }).format(val);
 
@@ -120,10 +134,10 @@ export default {
             },
             borderRadius: 5,
             leftborderWidth: 2,
-            borderColor: ['#b71c1c', '#2e7d32', '#fff9b4'],
-            color: '#404040',
-            size: '11',
-            backgroundColor: '#fff',
+            borderColor: ["#b71c1c", "#2e7d32", "#fff9b4"],
+            color: "#404040",
+            size: "11",
+            backgroundColor: "#fff",
           },
           legend: {
             display: false,
@@ -168,14 +182,14 @@ export default {
           y: {
             ticks: {
               color: "",
-              tickLength: 0
+              tickLength: 0,
             },
             grid: {
               color: "#9e9d24",
               borderDash: [1, 10],
               drawBorder: false,
               tickLength: 0,
-              tickWidth: 0
+              tickWidth: 0,
             },
           },
         },

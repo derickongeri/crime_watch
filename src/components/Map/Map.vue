@@ -1,9 +1,12 @@
 <template>
-  <div class="q-pa-xs" id="mapid"></div>
+  <div class="q-pa-xs" id="mapid">
+    <div></div>
+  </div>
 </template>
 
 <script>
 import { defineComponent, onMounted, ref } from "vue";
+import { Loading, QSpinnerFacebook, QSpinnerIos, QSpinnerOval } from "quasar";
 import { axios } from "src/boot/axios";
 
 import L from "leaflet";
@@ -13,6 +16,12 @@ import baselayers from "./Modals/baselayers.js";
 // import counties_2021 from './Modals/counties_2021.js'
 
 export default defineComponent({
+  components:{
+    barChart: require("components/charts/barChart.vue").default,
+    lineChart: require("components/charts/lineChart.vue").default,
+    pieChart: require("components/charts/pieChart.vue").default,
+  },
+
   setup() {
     const map = ref(null),
       center = ref([0, 37]),
@@ -40,7 +49,7 @@ export default defineComponent({
         center: center.value,
         maxBounds: bounds,
         zoom: 6.3,
-        maxZoom: 6.5,
+        maxZoom: 6.3,
         zoomSnap: 0.1,
         zoomAnimation: true,
         fadeAnimation: true,
@@ -64,7 +73,14 @@ export default defineComponent({
     };
 
     const setVector = async function () {
-      let wfsUrl =
+      try {
+        Loading.show({
+          spinner: QSpinnerOval,
+          spinnerSize: "xl",
+          message: "Loading...",
+        });
+
+        let wfsUrl =
         "http://78.141.234.158/geoserver/kenyadata/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=kenyadata%3A2021_county&maxFeatures=250&outputFormat=application%2Fjson";
 
       let response = await axios.get(wfsUrl);
@@ -119,6 +135,14 @@ export default defineComponent({
 
       jsonLayer.addTo(map.value).bringToFront();
       map.value.fitBounds(jsonLayer.getBounds())
+
+      Loading.hide();
+
+      } catch (error) {
+        console.log(error);
+        Loading.hide();
+      }
+
     };
 
     onMounted(() => {
@@ -138,10 +162,12 @@ export default defineComponent({
   position: relative;
   top: 0%;
   left: 0%;
-  width: 65%;
-  height: 70vh;
+  width: 100%;
+  /* height: 70vh; */
   bottom: 0%;
+  border-width: 1px;
   border-radius: 20px;
+  border-color: white;
   background: none;
 }
 </style>

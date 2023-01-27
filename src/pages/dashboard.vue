@@ -1,13 +1,10 @@
 <template>
-  <q-page class="page-body">
-    <div
-      class="row justify-center"
-      style="position: absolute; z-index: 5000; top: 0%; left: 20%"
-    >
-      <crimeTabs />
-    </div>
+  <q-page class="row page-body">
 
-    <Mappanel />
+      <Mappanel/>
+    <!-- <div class="col-2"><analysisTabs /></div>
+    <div class="col-6"></div>
+    <div class="col-4"><analysisTabs/></div> -->
   </q-page>
 </template>
 
@@ -18,6 +15,7 @@ export default defineComponent({
   components: {
     Mappanel: require("components/Map/Map.vue").default,
     crimeTabs: require("components/Selections/crimetabs.vue").default,
+    analysisTabs: require("components/Analysis/crimeAnalysis.vue").default,
   },
 
   setup() {},
@@ -26,10 +24,9 @@ export default defineComponent({
 
 <style scoped>
 .page-body {
-  background-image: url("~/src/assets/3387682.jpg");
-  background-position: center;
-  background-repeat: no-repeat;
+  height: 100%;
+  background: rgb(0, 0, 0) url("~/src/assets/3387682.jpg") no-repeat center;
   background-size: cover;
-  box-shadow: inset 0px 0px 50vw 16vh rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0px 0px 50vw 56vh rgba(0, 0, 0, 0.5);
 }
 </style>
