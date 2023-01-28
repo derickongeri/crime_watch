@@ -1,8 +1,7 @@
 <template>
 <div
-    class="q-my-none q-mt-none bg-black"
+    class="q-my-none q-mt-none"
     style="
-      background-color: rgba(0, 0, 0, 0.25);
       max-height: 35vh;
       border: 0px solid rgb(160, 160, 160);
       position: relative;

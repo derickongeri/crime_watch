@@ -1,6 +1,34 @@
 <template>
   <div class="q-pa-xs" id="mapid">
-    <div></div>
+    <div class="selection-tab" id="selection-container">
+      <selectionTab id="selection-container"/>
+    </div>
+  </div>
+  <div id="chart-area" class="q-ma-sm q-pa-sm">
+    <div class="q-ma-sm" id="chart-card" style="border-radius: 20px">
+      <barChart style="height: 30vh"/>
+    </div>
+    <div class="q-ma-sm" id="chart-card" style="border-radius: 20px">
+      <lineChart style="height: 30vh"/>
+    </div>
+  </div>
+  <div
+    class="row justify-between"
+    style="position: absolute; bottom: 0; width: 98vw; z-index: 5000"
+  >
+    <div
+      class="col-grow items-center q-ma-sm"
+      id="chart-card"
+      style="max-width: 20vw"
+    >
+      <pieChart style="height: 25vh" />
+    </div>
+    <div class="col-grow q-ma-sm" id="chart-card">
+      <lineChart style="height: 25vh" />
+    </div>
+    <div class="col-grow q-ma-sm" id="chart-card">
+      <crimeTable style="height: 25vh" />
+    </div>
   </div>
 </template>
 
@@ -16,10 +44,12 @@ import baselayers from "./Modals/baselayers.js";
 // import counties_2021 from './Modals/counties_2021.js'
 
 export default defineComponent({
-  components:{
+  components: {
     barChart: require("components/charts/barChart.vue").default,
     lineChart: require("components/charts/lineChart.vue").default,
     pieChart: require("components/charts/pieChart.vue").default,
+    crimeTable: require("components/table/crimeTable.vue").default,
+    selectionTab: require("components/Selections/crimetabs.vue").default,
   },
 
   setup() {
@@ -48,8 +78,8 @@ export default defineComponent({
         attributionControl: false,
         center: center.value,
         maxBounds: bounds,
-        zoom: 6.3,
-        maxZoom: 6.3,
+        zoom: 6.5,
+        maxZoom: 6.5,
         zoomSnap: 0.1,
         zoomAnimation: true,
         fadeAnimation: true,
@@ -75,74 +105,72 @@ export default defineComponent({
     const setVector = async function () {
       try {
         Loading.show({
-          spinner: QSpinnerOval,
+          spinner: QSpinnerFacebook,
           spinnerSize: "xl",
           message: "Loading...",
         });
 
         let wfsUrl =
-        "http://78.141.234.158/geoserver/kenyadata/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=kenyadata%3A2021_county&maxFeatures=250&outputFormat=application%2Fjson";
+          "http://78.141.234.158/geoserver/kenyadata/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=kenyadata%3A2021_county&maxFeatures=250&outputFormat=application%2Fjson";
 
-      let response = await axios.get(wfsUrl);
+        let response = await axios.get(wfsUrl);
 
-      const crimeIndexArray = response.data.features;
-      let crimeIndexvalues = [];
+        const crimeIndexArray = response.data.features;
+        let crimeIndexvalues = [];
 
-      crimeIndexArray.forEach((d) => {
-        crimeIndexvalues.push(d.properties.CRIME_INDE);
-      });
+        crimeIndexArray.forEach((d) => {
+          crimeIndexvalues.push(d.properties.CRIME_INDE);
+        });
 
-      const maxVal = Math.max(...crimeIndexvalues);
-      const minVal = Math.min(...crimeIndexvalues);
+        const maxVal = Math.max(...crimeIndexvalues);
+        const minVal = Math.min(...crimeIndexvalues);
 
-      const classInterval =
-        (Math.max(...crimeIndexvalues) - Math.min(...crimeIndexvalues)) / 7;
+        const classInterval =
+          (Math.max(...crimeIndexvalues) - Math.min(...crimeIndexvalues)) / 7;
 
-      console.log(classInterval);
+        console.log(classInterval);
 
-      console.log(crimeIndexvalues);
+        console.log(crimeIndexvalues);
 
-      function getColor(d) {
-        return d > maxVal
-          ? "#011f4b"
-          : d > minVal + classInterval * 5
-          ? "#03396c"
-          : d > minVal + classInterval * 4
-          ? "#005b96"
-          : d > minVal + classInterval * 3
-          ? "#6497b1"
-          : d > minVal + classInterval * 2
-          ? "#b3cde0"
-          : d > minVal + classInterval * 1
-          ? "#b3cde0"
-          : d > minVal
-          ? "#b3cde0"
-          : "#b3cde0";
-      }
+        function getColor(d) {
+          return d > maxVal
+            ? "#011f4b"
+            : d > minVal + classInterval * 5
+            ? "#03396c"
+            : d > minVal + classInterval * 4
+            ? "#005b96"
+            : d > minVal + classInterval * 3
+            ? "#6497b1"
+            : d > minVal + classInterval * 2
+            ? "#b3cde0"
+            : d > minVal + classInterval * 1
+            ? "#b3cde0"
+            : d > minVal
+            ? "#b3cde0"
+            : "#b3cde0";
+        }
 
-      function style(feature) {
-        return {
-          fillColor: getColor(feature.properties.CRIME_INDE),
-          weight: 2,
-          opacity: 1,
-          color: "white",
-          dashArray: "3",
-          fillOpacity: 0.7,
-        };
-      }
+        function style(feature) {
+          return {
+            fillColor: getColor(feature.properties.CRIME_INDE),
+            weight: 2,
+            opacity: 1,
+            color: "white",
+            dashArray: "3",
+            fillOpacity: 0.7,
+          };
+        }
 
-      const jsonLayer = L.geoJSON([response.data], { style: style });
+        const jsonLayer = L.geoJSON([response.data], { style: style });
 
-      jsonLayer.addTo(map.value).bringToFront();
-      map.value.fitBounds(jsonLayer.getBounds())
+        jsonLayer.addTo(map.value).bringToFront();
+        map.value.fitBounds(jsonLayer.getBounds());
 
-      Loading.hide();
-
+        Loading.hide();
       } catch (error) {
         console.log(error);
         Loading.hide();
       }
-
     };
 
     onMounted(() => {
@@ -162,12 +190,31 @@ export default defineComponent({
   position: relative;
   top: 0%;
   left: 0%;
-  width: 100%;
-  /* height: 70vh; */
+  width: 80%;
+  height: 70vh;
   bottom: 0%;
   border-width: 1px;
   border-radius: 20px;
   border-color: white;
   background: none;
+}
+#chart-area {
+  background: none;
+  border-radius: 20px;
+  position: absolute;
+  width: 45vw;
+  z-index: 5000;
+  right: 0;
+}
+
+#chart-card {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+}
+
+#selection-container{
+  position: absolute;
+  background-color: rgb(117, 117, 117);
 }
 </style>
